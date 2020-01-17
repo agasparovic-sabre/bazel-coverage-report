@@ -13,6 +13,9 @@
 # limitations under the License.
 """Coverage report generation."""
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+
 _LCOV_BUILD_FILE_CONTENT = """
 filegroup(
     name = "bin",
@@ -24,10 +27,11 @@ filegroup(
 def bazel_coverage_report_repositories():
   """Add to the WORKSPACE external dependencies needed by the generator.
   """
-  if "lcov" not in native.existing_rules():
-    native.new_git_repository(
-        name = "lcov",
-        build_file_content = _LCOV_BUILD_FILE_CONTENT,
-        commit = "a5dd9529f9232b8d901a4d6eb9ae54cae179e5b3",
-        remote = "https://github.com/linux-test-project/lcov.git",
-    )
+  maybe(
+      http_archive,
+      name = "lcov",
+      build_file_content = _LCOV_BUILD_FILE_CONTENT,
+      urls = ["https://github.com/linux-test-project/lcov/archive/v1.14.tar.gz"],
+      strip_prefix = "lcov-1.14",
+      sha256 = "f19eff1dcf5f40f4a57d959584acd318155873c43d723e25dd1b91636f94ca41",
+  )
